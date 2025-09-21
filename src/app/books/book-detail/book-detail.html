@@ -1,0 +1,7 @@
+<mat-card>
+  @if (book) {
+    <h2>{{ book.title }}</h2>
+    <p><strong>Author:</strong> {{ book.author }}</p>
+    <p><strong>Read:</strong> {{ book.read || 'Not read yet' }}</p>
+  }
+</mat-card>

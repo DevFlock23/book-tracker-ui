@@ -59,6 +59,10 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json",
+            "open": true
+          },
           "configurations": {
             "production": {
               "buildTarget": "book-tracker-ui:build:production"

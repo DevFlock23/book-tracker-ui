@@ -1,0 +1,47 @@
+<mat-card>
+  <form [formGroup]="bookForm" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Author</mat-label>
+      <input matInput formControlName="author" />
+    </mat-form-field>
+    
+    <mat-form-field>
+      <mat-label>Read</mat-label>
+      <input matInput formControlName="read" />
+    </mat-form-field>
+
+    <!--
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description"></textarea>
+    </mat-form-field>
+    -->
+
+    <!--
+    <mat-form-field>
+      <mat-label>Published Date</mat-label>
+      <input matInput type="date" formControlName="publishedDate" />
+    </mat-form-field>
+    -->
+
+    <!--
+    <mat-form-field>
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option value="to-read">To Read</mat-option>
+        <mat-option value="reading">Reading</mat-option>
+        <mat-option value="finished">Finished</mat-option>
+      </mat-select>
+    </mat-form-field>
+    -->
+
+    <button mat-raised-button color="primary" type="submit" [disabled]="bookForm.invalid">
+      {{ isEditMode ? 'Update' : 'Create' }}
+    </button>
+  </form>
+</mat-card>
