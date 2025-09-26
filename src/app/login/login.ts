@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../core/services/AuthService';
@@ -18,6 +19,7 @@ import { Router } from '@angular/router';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
+    MatButtonModule,
     RouterModule,
     FormsModule
   ],
@@ -35,8 +37,8 @@ export class LoginComponent {
       next: token => {
         console.debug('[LoginComponent] received token ->', token);
         this.authService.saveToken(token);
-        console.debug('[LoginComponent] token saved, navigating to home');
-        this.router.navigate(['/books']); // Redirect to the book list after login
+        console.debug('[LoginComponent] token saved, navigating to books');
+        this.router.navigate(['/books']);
       },
       error: (err) => {
         console.error('[LoginComponent] login failed ->', err);

@@ -20,15 +20,23 @@ export class BookService {
     return this.http.get<Book>(`${this.api}/${id}`);
   }
 
-  createBook(book: Book): Observable<Book> {
-    return this.http.post<Book>(this.api, book);
+  getBookById(id: number): Observable<Book> {
+    console.debug('[BookService] getBookById() request ->', `/api/books/${id}`);
+    return this.http.get<Book>(`/api/books/${id}`);
+  }
+
+  addBook(book: Book): Observable<Book> {
+    console.debug('[BookService] addBook() request ->', '/api/books', book);
+    return this.http.post<Book>('/api/books', book);
   }
 
   updateBook(id: number, book: Book): Observable<Book> {
-    return this.http.put<Book>(`${this.api}/${id}`, book);
+    console.debug('[BookService] updateBook() request ->', `/api/books/${id}`, book);
+    return this.http.put<Book>(`/api/books/${id}`, book);
   }
 
   deleteBook(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.api}/${id}`);
+    console.debug('[BookService] deleteBook() request ->', `/api/books/${id}`);
+    return this.http.delete<void>(`/api/books/${id}`);
   }
 }

@@ -31,4 +31,9 @@ export class AuthService {
   getToken(): string | null {
     return localStorage.getItem('jwtToken');
   }
+
+  logout(): void {
+    console.debug('[AuthService] logout() called');
+    localStorage.removeItem('jwtToken');
+  }
 }
