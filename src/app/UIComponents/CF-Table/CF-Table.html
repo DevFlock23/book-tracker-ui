@@ -1,0 +1,81 @@
+<div class="cf-table-container" [class.resizing]="isTableResizing">
+  <!-- Search Field -->
+  @if (config && config.showSearch) {
+    <mat-form-field 
+      class="cf-search-field" 
+      appearance="outline">
+      <mat-label>{{ (config && config.searchPlaceholder) || 'Search' }}</mat-label>
+      <input matInput (input)="applyFilter($event)" [placeholder]="(config && config.searchPlaceholder) || 'Search'">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  }
+
+  <!-- Table Container -->
+  <div class="cf-table-wrapper" [style.height]="(config && config.height) || '500px'">
+    <!-- Fixed Header Section -->
+    <div class="cf-header-section" #headerSection>
+      <table class="cf-header-table">
+        <thead>
+          <tr class="cf-header-row">
+            @if (config && config.columns) {
+              @for (column of config.columns; track column.key; let i = $index; let last = $last) {
+                <th 
+                  class="cf-header-cell" 
+                  [style.width]="getColumnWidth(column.key)">
+                  {{ column.label }}
+                  <!-- Resize Handle - only show for non-last columns -->
+                  @if (!last) {
+                    <div 
+                      class="resize-handle"
+                      (mousedown)="startResize($event, column.key)">
+                    </div>
+                  }
+                </th>
+              }
+            }
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <!-- Scrollable Body Section -->
+    <div class="cf-body-section" #tableWrapper>
+      <table mat-table [dataSource]="dataSource" class="cf-body-table">
+        <!-- Dynamic Column Definitions -->
+        @if (config && config.columns) {
+          @for (column of config.columns; track column.key) {
+            <ng-container [matColumnDef]="column.key">
+              <td 
+                mat-cell 
+                *matCellDef="let row" 
+                [style.width]="getColumnWidth(column.key)">
+                
+                <!-- Custom Content Projection -->
+                @if (column.type === 'custom') {
+                  <ng-container 
+                    *ngTemplateOutlet="getCustomTemplate(column.key); context: { $implicit: row, column: column }">
+                  </ng-container>
+                }
+                
+                <!-- Default Text Content -->
+                @if (column.type !== 'custom') {
+                  {{ row[column.key] }}
+                }
+              </td>
+            </ng-container>
+          }
+        }
+
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="cf-table-row"></tr>
+      </table>
+    </div>
+    
+    <!-- Pagination -->
+    @if (config && config.showPagination) {
+      <mat-paginator 
+        [pageSizeOptions]="(config && config.pageSizeOptions) || [5, 10, 20]" 
+        showFirstLastButtons>
+      </mat-paginator>
+    }
+  </div>
+</div>

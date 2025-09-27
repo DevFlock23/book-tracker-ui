@@ -4,61 +4,34 @@
   </mat-card-header>
   
   <mat-card-content>
-    <mat-form-field class="search-field" appearance="outline">
-      <mat-label>Search books</mat-label>
-      <input matInput (input)="applyFilter($event)" placeholder="Search by title or author">
-      <mat-icon matSuffix>search</mat-icon>
-    </mat-form-field>
-
-    <div class="table-container">
-      <table mat-table [dataSource]="dataSource" class="books-table">
-        <!-- Title Column -->
-        <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef>Title</th>
-          <td mat-cell *matCellDef="let book">{{ book.title }}</td>
-        </ng-container>
-
-        <!-- Author Column -->
-        <ng-container matColumnDef="author">
-          <th mat-header-cell *matHeaderCellDef>Author</th>
-          <td mat-cell *matCellDef="let book">{{ book.author }}</td>
-        </ng-container>
-
-        <!-- Read Status Column -->
-        <ng-container matColumnDef="read">
-          <th mat-header-cell *matHeaderCellDef>Status</th>
-          <td mat-cell *matCellDef="let book">
-            <mat-chip [color]="book.read ? 'primary' : 'accent'" selected>
-              <mat-icon>{{ book.read ? 'check_circle' : 'schedule' }}</mat-icon>
-              {{ book.read ? 'Read' : 'To Read' }}
-            </mat-chip>
-          </td>
-        </ng-container>
-
-        <!-- Actions Column -->
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
-          <td mat-cell *matCellDef="let book" class="action-buttons">
-            <button mat-icon-button [routerLink]="['/books', book.id]" matTooltip="View Details">
-              <mat-icon>visibility</mat-icon>
-            </button>
-            <button mat-icon-button [routerLink]="['/books', book.id, 'edit']" matTooltip="Edit Book">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="deleteBook(book.id)" matTooltip="Delete Book">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="book-row"></tr>
-      </table>
-    </div>
-
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    <cf-table 
+      [data]="books" 
+      [config]="tableConfig" 
+      [loading]="loading"
+      [customTemplates]="customTemplates"
+      (rowAction)="onTableAction($event)">
+    </cf-table>
   </mat-card-content>
 </mat-card>
+
+<!-- Custom Templates -->
+<ng-template #statusTemplate let-book>
+  <mat-chip [color]="book.read ? 'primary' : 'accent'" selected>
+    {{ book.read ? 'Read' : 'To Read' }}
+  </mat-chip>
+</ng-template>
+
+<ng-template #actionsTemplate let-book>
+  <button mat-icon-button [routerLink]="['/books', book.id]" matTooltip="View Details">
+    <mat-icon>visibility</mat-icon>
+  </button>
+  <button mat-icon-button [routerLink]="['/books', book.id, 'edit']" matTooltip="Edit Book">
+    <mat-icon>edit</mat-icon>
+  </button>
+  <button mat-icon-button color="warn" (click)="deleteBook(book.id)" matTooltip="Delete Book">
+    <mat-icon>delete</mat-icon>
+  </button>
+</ng-template>
 
 <button mat-fab color="primary" class="add-button" [routerLink]="['/books/new']" matTooltip="Add New Book">
   <mat-icon>add</mat-icon>

@@ -1,18 +1,14 @@
-import { Component, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
-import { MatTableDataSource } from '@angular/material/table';
 
+import { CFTableComponent, CFTableConfig } from '../../UIComponents/CF-Table/CF-Table';
 import { BookService } from '../../core/services/book';
 import { AuthService } from '../../core/services/AuthService';
 import { Book } from '../../models/Book';
@@ -22,25 +18,40 @@ import { Book } from '../../models/Book';
   standalone: true,
   imports: [
     CommonModule,
-    MatTableModule,
-    MatPaginatorModule,
     MatSnackBarModule,
     MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatIconModule,
     MatButtonModule,
     MatChipsModule,
     MatTooltipModule,
-    RouterModule
+    RouterModule,
+    CFTableComponent
   ],
   templateUrl: './book-list.html',
   styleUrls: ['./book-list.scss']
 })
-export class BookListComponent implements AfterViewInit {
-  displayedColumns = ['title', 'author', 'read', 'actions'];
-  dataSource = new MatTableDataSource<Book>([]);
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+export class BookListComponent implements OnInit {
+  books: Book[] = [];
+  loading = false;
+
+  tableConfig: CFTableConfig = {
+    columns: [
+      { key: 'title', label: 'Title', width: 200, minWidth: 150 },
+      { key: 'author', label: 'Author', width: 150, minWidth: 120 },
+      { key: 'read', label: 'Status', width: 140, minWidth: 120, type: 'custom' },
+      { key: 'actions', label: 'Actions', width: 160, minWidth: 140, type: 'custom' }
+    ],
+    showSearch: true,
+    searchPlaceholder: 'Search by title or author',
+    showPagination: true,
+    pageSizeOptions: [5, 10, 20],
+    height: '500px'
+  };
+
+  @ViewChild('statusTemplate', { static: true }) statusTemplate!: TemplateRef<any>;
+  @ViewChild('actionsTemplate', { static: true }) actionsTemplate!: TemplateRef<any>;
+
+  customTemplates: { [key: string]: TemplateRef<any> } = {};
 
   constructor(
     private bookService: BookService, 
@@ -48,24 +59,36 @@ export class BookListComponent implements AfterViewInit {
     private authService: AuthService
   ) {}
 
-  ngAfterViewInit() {
+  ngOnInit() {
+    // Set up custom templates
+    setTimeout(() => {
+      this.customTemplates = {
+        'read': this.statusTemplate,
+        'actions': this.actionsTemplate
+      };
+    });
+
     const token = this.authService.getToken();
     if (!token) {
       this.snack.open('Please log in to access books', 'Close', { duration: 3000 });
       return;
     }
 
-    this.dataSource.paginator = this.paginator;
     this.loadBooks();
   }
 
   loadBooks() {
+    this.loading = true;
     this.bookService.getBooks(0, 100).subscribe({
       next: res => {
         console.log('[BookListComponent] Loaded books:', res.content);
-        this.dataSource.data = res.content;
+        this.books = res.content;
+        this.loading = false;
       },
-      error: () => this.snack.open('Failed to load books', 'Close', { duration: 3000 })
+      error: () => {
+        this.snack.open('Failed to load books', 'Close', { duration: 3000 });
+        this.loading = false;
+      }
     });
   }
 
@@ -81,8 +104,11 @@ export class BookListComponent implements AfterViewInit {
     }
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  onTableAction(event: {action: string, row: any}) {
+    switch(event.action) {
+      case 'delete':
+        this.deleteBook(event.row.id);
+        break;
+    }
   }
 }
